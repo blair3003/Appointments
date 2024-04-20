@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 using System;
 using System.Collections.Generic;
@@ -15,9 +17,18 @@ namespace Appointments.Tests
         {
             builder.ConfigureServices(services =>
             {
-                // Override services for testing
-                // For example, using InMemory database for Entity Framework
+                services.AddDbContextFactory<AppointmentsDbContext>(options =>
+                {
+                    options.UseInMemoryDatabase("Appointments");
+                });
             });
+        }
+
+        public AppointmentsDbContext CreateAppointmentsDbContext()
+        {
+            var db = Services.GetRequiredService<IDbContextFactory<AppointmentsDbContext>>().CreateDbContext();
+            db.Database.EnsureCreated();
+            return db;
         }
     }
 }
