@@ -26,14 +26,16 @@ namespace Appointments.Tests
         [Fact]
         public async Task Should_add_to_storage_When_post_new_appointment()
         {
+            const string appointmentTitle = "Test";
+
             var response = await _client.PostAsJsonAsync("/api/appointments", new
             {
-                Title = "Test",
+                Title = appointmentTitle,
             });
 
             response.EnsureSuccessStatusCode();
 
-            var dbEntry = await _dbContext.Appointments.FirstOrDefaultAsync(appointment => appointment.Title == "Test");
+            var dbEntry = await _dbContext.Appointments.FirstOrDefaultAsync(appointment => appointment.Title == appointmentTitle);
 
             Assert.NotNull(dbEntry);
         }
