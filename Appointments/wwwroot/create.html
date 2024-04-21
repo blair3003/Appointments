@@ -1,0 +1,51 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create Appointment</title>
+</head>
+<body>
+    <h1>Create Appointment</h1>
+    <form id="appointmentForm">
+        <input type="text" id="title" placeholder="Title">
+        <textarea id="description" placeholder="Description"></textarea>
+        <input type="datetime-local" id="startTime" placeholder="Start Time">
+        <input type="datetime-local" id="endTime" placeholder="End Time">
+        <label>
+            All Day
+            <input type="checkbox" id="isAllDay">
+        </label>
+        <button type="submit">Submit</button>
+    </form>
+    <script>
+        document.getElementById('appointmentForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const title = document.getElementById('title').value;
+            const description = document.getElementById('description').value;
+            const startTime = document.getElementById('startTime').value;
+            const endTime = document.getElementById('endTime').value;
+            const isAllDay = document.getElementById('isAllDay').checked;
+
+            fetch('/api/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title: title,
+                    description: description,
+                    startTime: startTime,
+                    endTime: endTime,
+                    isAllDay: isAllDay
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    alert('Appointment created!');
+                    window.location.href = '/'; // Redirect to homepage
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Appointments</title>
+</head>
+<body>
+    <h1>Appointments</h1>
+    <a href="/create">Create new Appointment</a>
+    <div id="appointments"></div>
+    <script>
+        fetch('/api/appointments')
+            .then(response => response.json())
+            .then(data => {
+                const appointments = document.getElementById('appointments');
+                appointments.innerHTML = JSON.stringify(data, null, 2);
+            });
+    </script>
+</body>
+</html>

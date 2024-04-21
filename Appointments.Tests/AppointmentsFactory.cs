@@ -1,13 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.TestHost;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Appointments.Tests
 {
@@ -15,20 +10,27 @@ namespace Appointments.Tests
     {
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
-            builder.ConfigureServices(services =>
+            builder.ConfigureTestServices(services =>
             {
-                services.AddDbContextFactory<AppointmentsDbContext>(options =>
+                // Remove the existing DbContext configuration
+                var descriptor = services.SingleOrDefault(
+                    d => d.ServiceType == typeof(DbContextOptions<AppointmentsDbContext>));
+
+                if (descriptor != null)
                 {
-                    options.UseInMemoryDatabase("Appointments");
-                });
+                    services.Remove(descriptor);
+                }
+
+                // Add a new DbContext with SQLite for testing
+                services.AddDbContext<AppointmentsDbContext>(options =>
+                    options.UseSqlite("Filename=TestAppointments.db"), ServiceLifetime.Scoped);
             });
         }
 
-        public AppointmentsDbContext CreateAppointmentsDbContext()
+        public void InitializeDbForTests(AppointmentsDbContext db)
         {
-            var db = Services.GetRequiredService<IDbContextFactory<AppointmentsDbContext>>().CreateDbContext();
+            db.Database.EnsureDeleted();
             db.Database.EnsureCreated();
-            return db;
         }
     }
 }
